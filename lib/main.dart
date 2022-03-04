@@ -1,121 +1,279 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter/material.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(const MaterialApp(
+    title: 'First App',
+    home: AuthorizationRoute(),
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class AuthorizationRoute extends StatelessWidget {
+  const AuthorizationRoute({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.x
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.green,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Welcome'),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+              child: const Text('Login'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginRoute()),
+                );
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Register'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const RegisterRoute()),
+                );
+              },
+            ),
+          ]),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class LoginRoute extends StatelessWidget {
+  const LoginRoute({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Login'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+      body: const Center(child: LoginForm()),
+    );
+  }
+}
+
+class RegisterRoute extends StatelessWidget {
+  const RegisterRoute({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Register'),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: const Center(child: RegisterForm()),
+    );
+  }
+}
+
+// Create a Form widget.
+class LoginForm extends StatefulWidget {
+  const LoginForm({Key? key}) : super(key: key);
+
+  @override
+  LoginFormState createState() {
+    return LoginFormState();
+  }
+}
+
+// Create a corresponding State class.
+// This class holds data related to the form.
+class LoginFormState extends State<LoginForm> {
+  // Create a global key that uniquely identifies the Form widget
+  // and allows validation of the form.
+  //
+  // Note: This is a GlobalKey<FormState>,
+  // not a GlobalKey<LoginFormState>.
+  final _formKey = GlobalKey<FormState>();
+  bool _obscurePass = true;
+
+  @override
+  Widget build(BuildContext context) {
+    // Build a Form widget using the _formKey created above.
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          TextFormField(
+              decoration: const InputDecoration(
+                filled: true,
+                labelText: 'Username',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your username';
+                }
+                if (value.length < 3) {
+                  return 'Username is too short (must be at least 3 characters)';
+                }
+                return null;
+              }),
+          TextFormField(
+              decoration: InputDecoration(
+                  filled: true,
+                  labelText: 'Password',
+                  suffixIcon: IconButton(
+                      icon: Icon(_obscurePass
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePass = !_obscurePass;
+                        });
+                      })),
+              obscureText: _obscurePass,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                if (value.length < 4) {
+                  return 'Password is too short (must be at least 4 characters)';
+                }
+                return null;
+              }),
+          ElevatedButton(
+            onPressed: () {
+              var valid = _formKey.currentState!.validate();
+              if (!valid) {
+                return;
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Logging in...')),
+              );
+            },
+            child: const Text('Login'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Create a Form widget.
+class RegisterForm extends StatefulWidget {
+  const RegisterForm({Key? key}) : super(key: key);
+
+  @override
+  RegisterFormState createState() {
+    return RegisterFormState();
+  }
+}
+
+// Create a corresponding State class.
+// This class holds data related to the form.
+class RegisterFormState extends State<RegisterForm> {
+  // Create a global key that uniquely identifies the Form widget
+  // and allows validation of the form.
+  //
+  // Note: This is a GlobalKey<FormState>,
+  // not a GlobalKey<RegisterFormState>.
+  final _formKey = GlobalKey<FormState>();
+  bool _obscurePass = true;
+  bool _obscurePassRepeat = true;
+
+  @override
+  Widget build(BuildContext context) {
+    String? password;
+    // Build a Form widget using the _formKey created above.
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          TextFormField(
+              decoration: const InputDecoration(
+                filled: true,
+                labelText: 'Username',
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your username';
+                }
+                if (value.length < 3) {
+                  return 'Username is too short (must be at least 3 characters)';
+                }
+                return null;
+              }),
+          TextFormField(
+              decoration: InputDecoration(
+                filled: true,
+                labelText: 'Password',
+                suffixIcon: IconButton(
+                    icon: Icon(
+                        _obscurePass ? Icons.visibility : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePass = !_obscurePass;
+                      });
+                    }),
+              ),
+              obscureText: _obscurePass,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                if (value.length < 4) {
+                  return 'Password is too short (must be at least 4 characters)';
+                }
+                return null;
+              },
+              onChanged: (value) {
+                password = value;
+              }),
+          TextFormField(
+              decoration: InputDecoration(
+                filled: true,
+                labelText: 'Repeat Password',
+                suffixIcon: IconButton(
+                    icon: Icon(_obscurePassRepeat
+                        ? Icons.visibility
+                        : Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassRepeat = !_obscurePassRepeat;
+                      });
+                    }),
+              ),
+              obscureText: _obscurePassRepeat,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please repeat your password';
+                }
+                if (value.length < 4) {
+                  return 'Password is too short (must be at least 4 characters)';
+                }
+                if (value != password) {
+                  return 'Does not match password';
+                }
+                return null;
+              }),
+          ElevatedButton(
+            onPressed: () {
+              var valid = _formKey.currentState!.validate();
+              if (!valid) {
+                return;
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Registering...')),
+              );
+            },
+            child: const Text('Register'),
+          ),
+        ],
+      ),
     );
   }
 }
