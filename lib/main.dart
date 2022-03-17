@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
@@ -7,10 +8,19 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MaterialApp(
-    title: 'First App',
-    home: AuthorizationRoute(),
-  ));
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: 'First App',
+      home: AuthorizationRoute(),
+    );
+  }
 }
 
 class AuthorizationRoute extends StatelessWidget {
@@ -187,6 +197,7 @@ class RegisterFormState extends State<RegisterForm> {
   @override
   Widget build(BuildContext context) {
     String? password;
+    String? email;
     // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
@@ -196,16 +207,19 @@ class RegisterFormState extends State<RegisterForm> {
           TextFormField(
               decoration: const InputDecoration(
                 filled: true,
-                labelText: 'Username',
+                labelText: 'Email',
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your username';
+                  return 'Please enter your Email';
                 }
                 if (value.length < 3) {
-                  return 'Username is too short (must be at least 3 characters)';
+                  return 'Email is too short (must be at least 3 characters)';
                 }
                 return null;
+              },
+              onChanged: (value) {
+                email = value;
               }),
           TextFormField(
               decoration: InputDecoration(
@@ -261,7 +275,7 @@ class RegisterFormState extends State<RegisterForm> {
                 return null;
               }),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               var valid = _formKey.currentState!.validate();
               if (!valid) {
                 return;
@@ -269,6 +283,36 @@ class RegisterFormState extends State<RegisterForm> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Registering...')),
               );
+              try {
+                UserCredential userCredential = await FirebaseAuth.instance
+                    .createUserWithEmailAndPassword(
+                        email: email!, password: password!);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Success! Welcome to my app.')),
+                );
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'weak-password') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('The password provided is too weak.')),
+                  );
+                } else if (e.code == 'email-already-in-use') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('The account already exists for that email.')),
+                  );
+                } else if (e.code == 'invalid-email') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('That email is invalid.')),
+                  );
+                }
+              } catch (e) {
+                print(e);
+              }
             },
             child: const Text('Register'),
           ),
