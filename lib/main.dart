@@ -88,6 +88,25 @@ class RegisterRoute extends StatelessWidget {
   }
 }
 
+class WelcomeRoute extends StatelessWidget {
+  const WelcomeRoute({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    String email = "";
+    if (currentUser != null && currentUser.email != null) {
+      email = currentUser.email!;
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Welcome!'),
+      ),
+      body: Center(child: Text(email)),
+    );
+  }
+}
+
 // Create a Form widget.
 class LoginForm extends StatefulWidget {
   const LoginForm({Key? key}) : super(key: key);
@@ -179,6 +198,11 @@ class LoginFormState extends State<LoginForm> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                       content: Text('Successfully logged in!')),
+                );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const WelcomeRoute()),
                 );
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-not-found') {
@@ -329,6 +353,11 @@ class RegisterFormState extends State<RegisterForm> {
                         email: email, password: password);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Success! Welcome to my app.')),
+                );
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const WelcomeRoute()),
                 );
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'weak-password') {
