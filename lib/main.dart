@@ -109,6 +109,9 @@ class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePass = true;
 
+  String email = "";
+  String password = "";
+
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
@@ -120,16 +123,19 @@ class LoginFormState extends State<LoginForm> {
           TextFormField(
               decoration: const InputDecoration(
                 filled: true,
-                labelText: 'Username',
+                labelText: 'Email',
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your username';
+                  return 'Please enter your email';
                 }
                 if (value.length < 3) {
-                  return 'Username is too short (must be at least 3 characters)';
+                  return 'Email is too short (must be at least 3 characters)';
                 }
                 return null;
+              },
+              onChanged: (value) {
+                email = value;
               }),
           TextFormField(
               decoration: InputDecoration(
@@ -153,9 +159,12 @@ class LoginFormState extends State<LoginForm> {
                   return 'Password is too short (must be at least 4 characters)';
                 }
                 return null;
+              },
+              onChanged: (value) {
+                password = value;
               }),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               var valid = _formKey.currentState!.validate();
               if (!valid) {
                 return;
@@ -163,6 +172,36 @@ class LoginFormState extends State<LoginForm> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Logging in...')),
               );
+              try {
+                UserCredential userCredential = await FirebaseAuth.instance
+                    .signInWithEmailAndPassword(
+                        email: email, password: password);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Successfully logged in!')),
+                );
+              } on FirebaseAuthException catch (e) {
+                if (e.code == 'user-not-found') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('No account exists with that email.')),
+                  );
+                  print('No user found for that email.');
+                } else if (e.code == 'wrong-password') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Wrong password.')),
+                  );
+                  print('Wrong password provided for that user.');
+                } else if (e.code == 'invalid-email') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('That email is invalid.')),
+                  );
+                  print('Invalid email.');
+                }
+              } catch (e) {
+                print(e);
+              }
             },
             child: const Text('Login'),
           ),
@@ -194,10 +233,11 @@ class RegisterFormState extends State<RegisterForm> {
   bool _obscurePass = true;
   bool _obscurePassRepeat = true;
 
+  String password = "";
+  String email = "";
+
   @override
   Widget build(BuildContext context) {
-    String? password;
-    String? email;
     // Build a Form widget using the _formKey created above.
     return Form(
       key: _formKey,
@@ -286,10 +326,9 @@ class RegisterFormState extends State<RegisterForm> {
               try {
                 UserCredential userCredential = await FirebaseAuth.instance
                     .createUserWithEmailAndPassword(
-                        email: email!, password: password!);
+                        email: email, password: password);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Success! Welcome to my app.')),
+                  const SnackBar(content: Text('Success! Welcome to my app.')),
                 );
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'weak-password') {
@@ -305,9 +344,7 @@ class RegisterFormState extends State<RegisterForm> {
                   );
                 } else if (e.code == 'invalid-email') {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content:
-                            Text('That email is invalid.')),
+                    const SnackBar(content: Text('That email is invalid.')),
                   );
                 }
               } catch (e) {
