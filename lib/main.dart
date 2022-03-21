@@ -188,6 +188,7 @@ class LoginFormState extends State<LoginForm> {
               if (!valid) {
                 return;
               }
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Logging in...')),
               );
@@ -195,29 +196,30 @@ class LoginFormState extends State<LoginForm> {
                 UserCredential userCredential = await FirebaseAuth.instance
                     .signInWithEmailAndPassword(
                         email: email, password: password);
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text('Successfully logged in!')),
+                  const SnackBar(content: Text('Successfully logged in!')),
                 );
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const WelcomeRoute()),
+                  MaterialPageRoute(builder: (context) => const WelcomeRoute()),
                 );
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-not-found') {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content: Text('No account exists with that email.')),
                   );
                   print('No user found for that email.');
                 } else if (e.code == 'wrong-password') {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Wrong password.')),
+                    const SnackBar(content: Text('Wrong password.')),
                   );
                   print('Wrong password provided for that user.');
                 } else if (e.code == 'invalid-email') {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('That email is invalid.')),
                   );
@@ -344,6 +346,7 @@ class RegisterFormState extends State<RegisterForm> {
               if (!valid) {
                 return;
               }
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Registering...')),
               );
@@ -351,27 +354,30 @@ class RegisterFormState extends State<RegisterForm> {
                 UserCredential userCredential = await FirebaseAuth.instance
                     .createUserWithEmailAndPassword(
                         email: email, password: password);
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Success! Welcome to my app.')),
                 );
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => const WelcomeRoute()),
+                  MaterialPageRoute(builder: (context) => const WelcomeRoute()),
                 );
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'weak-password') {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content: Text('The password provided is too weak.')),
                   );
                 } else if (e.code == 'email-already-in-use') {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content:
                             Text('The account already exists for that email.')),
                   );
                 } else if (e.code == 'invalid-email') {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('That email is invalid.')),
                   );
