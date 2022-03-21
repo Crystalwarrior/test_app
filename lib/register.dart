@@ -2,6 +2,31 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'routes.dart';
 
+// Password validation logic
+String? validatePassword(String? value, String? password) {
+  if (value == null || value.isEmpty) {
+    return 'Please repeat your password';
+  }
+  if (value.length < 4) {
+    return 'Password is too short (must be at least 4 characters)';
+  }
+  if (password != null && value != password) {
+    return 'Does not match password';
+  }
+  return null;
+}
+
+// Email validation logic
+String? validateEmail(value) {
+  if (value == null || value.isEmpty) {
+    return 'Please enter your Email';
+  }
+  if (value.length < 3) {
+    return 'Email is too short (must be at least 3 characters)';
+  }
+  return null;
+}
+
 // Create a Form widget.
 class RegisterForm extends StatefulWidget {
   const RegisterForm({Key? key}) : super(key: key);
@@ -41,13 +66,7 @@ class RegisterFormState extends State<RegisterForm> {
                 labelText: 'Email',
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your Email';
-                }
-                if (value.length < 3) {
-                  return 'Email is too short (must be at least 3 characters)';
-                }
-                return null;
+                return validateEmail(value);
               },
               onChanged: (value) {
                 email = value;
@@ -67,13 +86,7 @@ class RegisterFormState extends State<RegisterForm> {
               ),
               obscureText: _obscurePass,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                if (value.length < 4) {
-                  return 'Password is too short (must be at least 4 characters)';
-                }
-                return null;
+                return validatePassword(value, null);
               },
               onChanged: (value) {
                 password = value;
@@ -94,16 +107,7 @@ class RegisterFormState extends State<RegisterForm> {
               ),
               obscureText: _obscurePassRepeat,
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please repeat your password';
-                }
-                if (value.length < 4) {
-                  return 'Password is too short (must be at least 4 characters)';
-                }
-                if (value != password) {
-                  return 'Does not match password';
-                }
-                return null;
+                return validatePassword(value, password);
               }),
           ElevatedButton(
             onPressed: () async {
