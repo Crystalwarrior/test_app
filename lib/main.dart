@@ -193,9 +193,8 @@ class LoginFormState extends State<LoginForm> {
                 const SnackBar(content: Text('Logging in...')),
               );
               try {
-                UserCredential userCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: email, password: password);
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    email: email, password: password);
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Successfully logged in!')),
@@ -211,22 +210,19 @@ class LoginFormState extends State<LoginForm> {
                     const SnackBar(
                         content: Text('No account exists with that email.')),
                   );
-                  print('No user found for that email.');
                 } else if (e.code == 'wrong-password') {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Wrong password.')),
                   );
-                  print('Wrong password provided for that user.');
                 } else if (e.code == 'invalid-email') {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('That email is invalid.')),
                   );
-                  print('Invalid email.');
                 }
               } catch (e) {
-                print(e);
+                return;
               }
             },
             child: const Text('Login'),
@@ -351,9 +347,8 @@ class RegisterFormState extends State<RegisterForm> {
                 const SnackBar(content: Text('Registering...')),
               );
               try {
-                UserCredential userCredential = await FirebaseAuth.instance
-                    .createUserWithEmailAndPassword(
-                        email: email, password: password);
+                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email, password: password);
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Success! Welcome to my app.')),
@@ -383,7 +378,7 @@ class RegisterFormState extends State<RegisterForm> {
                   );
                 }
               } catch (e) {
-                print(e);
+                return;
               }
             },
             child: const Text('Register'),
